@@ -1,0 +1,165 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
+  <script language="javascript" src="libraries/jquery.min.js"></script>
+  <script language="javascript" src="libraries/p5.sound.js"></script>
+  <script language="javascript" src="sketch.js"></script>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+  <div class="content">
+
+    <div class="applause_texto">
+      <a href="#">
+          <img src="/assets/ApplauseTEXTO2.png">
+      </a>
+    </div> 
+
+    <div class="applause_on">
+      <a href="#">
+      <img src="/assets/LogoApplauseON2.png">
+      </a>
+    </div> 
+
+    <div class="applause_off">
+      <img src="/assets/LogoApplauseOFF2.png">
+    </div> 
+
+
+    <div class="status">      
+    </div>
+
+
+  </div>
+
+
+<script>
+var disconfort_time = 3000;
+var callibration_time = 5000;
+
+
+var input=null;
+var on = false;
+var analyzer;
+var applause = new Audio('./assets/applause.mp3');
+var amp = 10000;
+
+var start = 0;
+var avg_noise = null;
+volcal_val = [];
+
+
+
+function avg(arr){
+  var sum = 0;
+  for( var i = 0; i < arr.length; i++ ){
+      sum += arr[i]
+  }
+  var avg = sum/arr.length;
+  return avg;
+}
+
+function start_input(){
+  start = new Date().getTime();
+  start_cal = new Date().getTime();
+  var avg_noise = null;
+
+  $(".status").text("callibrating...");
+
+  on = true;
+  input = new p5.AudioIn();
+  input.start();
+}
+
+function stop_input(){
+  input.stop();
+  on = false;
+}
+
+function setControls(){
+  $(".applause_on" ).click(function() {
+    $(".applause_on" ).toggle();
+    $(".applause_off" ).toggle();
+    console.log("start");
+    start_input();
+  });
+
+  $(".applause_off" ).click(function() {
+    $(".applause_on" ).toggle();
+    $(".applause_off" ).toggle();
+    console.log("stop");
+    stop_input();
+  });
+  
+}
+  
+
+function setup() {
+  createCanvas(510, 200);
+  background(255);
+  setControls();
+}
+
+function draw() {
+  // Get the overall volume (between 0 and 1.0)
+  if (input && on){
+    
+    var volume = input.getLevel();
+    now_cal = new Date().getTime();
+    time_cal = now_cal - start_cal;
+    
+    if (time_cal < callibration_time){
+
+      volcal_val.push(volume*amp);
+      $(".status").text("callibrating: read "+ parseInt(volume*amp) + " on "+ parseInt(time_cal/1000)+"s.");
+      console.log("volume on callibration", volume*amp, time_cal);
+
+    }else{
+      
+      if (!avg_noise) {
+        avg_noise = avg(volcal_val)/3;
+        $(".status").text("Average amp: "+avg_noise);
+        console.log("set average amp to: "+avg_noise);
+      }
+
+      if (volume*amp < avg_noise) {
+        now = new Date().getTime();
+        time = now - start;
+
+        if (time > disconfort_time){
+          $(".status").text("APPPLAUSE! [detected silence: " + parseInt(volume*amp) +" under: " + parseInt(avg_noise) + " longer than " + disconfort_time/1000 + "s.]");
+          start = new Date().getTime();
+          console.log("APPPLAUSE", volume*amp, avg_noise)
+          applause.play();
+
+        }
+        console.log("microsilence: "+ volume*amp + " for " + time +"s.")
+      }else{
+        console.log("over average: "+ volume*amp )
+        // reset discomfort time timer
+        start = new Date().getTime();
+      }
+
+      // Graph the overall potential volume, w/ a line at the threshold
+      var y = map(volume, 0, 1, height, 0);
+      var ythreshold = map(avg_noise, 0, 1, height, 0);
+
+      noStroke();
+      fill(250);
+      rect(0, 0, 500, height);
+      // Then draw a rectangle on the graph, sized according to volume
+      fill(0);
+      rect(0, y, 500, y);
+      stroke(0);
+      line(0, ythreshold, 19, ythreshold);
+    }
+
+  }
+  
+}
+
+</script>
+</body>
+</html>

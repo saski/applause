@@ -1,0 +1,23 @@
+*{
+	padding: 0; margin: 0;
+}
+
+.content, body{
+	width: 100%;
+	text-align: center;
+}
+.content > div, canvas{
+	margin:3em auto;
+}
+
+
+.content .applause_off{
+	display:none;
+}
+
+.content .status{
+	font-family: "Lucida Console", Monaco, monospace;
+	margin-top: 12em;
+	font-size: 12px;
+	color:green;
+}
