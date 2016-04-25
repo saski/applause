@@ -13,18 +13,18 @@
 
     <div class="applause_texto">
       <a href="#">
-          <img src="/assets/ApplauseTEXTO2.png">
+          <img src="assets/ApplauseTEXTO2.png">
       </a>
     </div> 
 
     <div class="applause_on">
       <a href="#">
-      <img src="/assets/LogoApplauseON2.png">
+      <img src="assets/LogoApplauseON2.png">
       </a>
     </div> 
 
     <div class="applause_off">
-      <img src="/assets/LogoApplauseOFF2.png">
+      <img src="assets/LogoApplauseOFF2.png">
     </div> 
 
 
@@ -43,7 +43,7 @@ var callibration_time = 5000;
 var input=null;
 var on = false;
 var analyzer;
-var applause = new Audio('./assets/applause.mp3');
+var applause = new Audio('assets/applause.mp3');
 var amp = 10000;
 
 var start = 0;
@@ -103,7 +103,6 @@ function setup() {
 }
 
 function draw() {
-  // Get the overall volume (between 0 and 1.0)
   if (input && on){
     
     var volume = input.getLevel();
